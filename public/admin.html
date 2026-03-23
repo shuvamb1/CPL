@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal | CPL 2026</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+</head>
+<body class="admin-page">
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo-container">
+                <img src="assets/CPL.svg" alt="CPL Logo" class="logo">
+            </a>
+            <button class="menu-toggle" id="menu-toggle"><span></span></button>
+            <ul class="nav-links">
+                <li><a href="index.html">View Website</a></li>
+                <li><button id="logout-btn" class="nav-admin-btn" style="display:none; border:none; cursor:pointer;">Logout</button></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container" style="padding-top: 120px;">
+        <!-- Login Section -->
+        <section id="admin-login" class="admin-login-layout">
+            <div class="admin-card">
+                <h2 style="text-align: center; margin-bottom: 2rem; font-weight: 900;">SECURE LOGIN</h2>
+                <div class="form-group">
+                    <label>ACCESS KEY</label>
+                    <input type="password" id="admin-key-input" placeholder="••••••••••••" style="text-align: center; letter-spacing: 4px;">
+                </div>
+                <button id="login-btn" class="btn-primary-full">AUTHENTICATE</button>
+            </div>
+        </section>
+
+        <!-- Admin Dashboard -->
+        <section id="admin-dashboard" style="display: none;">
+            <div class="section-header">
+                <h2 class="section-title"><span>Management</span>Admin Dashboard</h2>
+            </div>
+
+            <div class="admin-dashboard-grid">
+                <!-- Registration -->
+                <div class="dashboard-card">
+                    <h3>Register Player</h3>
+                    <form id="registration-form">
+                        <div class="form-group">
+                            <label>FULL NAME</label>
+                            <input type="text" id="reg-name" placeholder="Enter name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>EMAIL ADDRESS</label>
+                            <input type="email" id="reg-email" placeholder="Enter email" required>
+                        </div>
+                        <div class="form-group">
+                            <label>PROFILE IMAGE URL</label>
+                            <input type="text" id="reg-image" placeholder="https://example.com/photo.jpg">
+                        </div>
+                        <button type="submit" class="btn-primary-full">REGISTER PLAYER</button>
+                    </form>
+                    <div id="reg-message" style="margin-top: 1.5rem; text-align: center; font-weight: 600;"></div>
+                </div>
+
+                <!-- Update Team Stats -->
+                <div class="dashboard-card">
+                    <h3>Team Performance</h3>
+                    <div class="form-group">
+                        <label>SELECT TEAM</label>
+                        <select id="team-select"></select>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <input type="number" id="team-played" placeholder="P">
+                        <input type="number" id="team-won" placeholder="W">
+                        <input type="number" id="team-lost" placeholder="L">
+                        <input type="number" id="team-nrr" step="0.001" placeholder="NRR">
+                    </div>
+                    <div class="form-group" style="margin-top: 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <input type="number" id="team-points" placeholder="Points">
+                        <div style="visibility: hidden;"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>CAPTAIN NAME</label>
+                        <input type="text" id="captain-name" placeholder="Captain Name">
+                    </div>
+                    <div class="form-group">
+                        <label>CAPTAIN IMAGE URL</label>
+                        <input type="text" id="captain-image" placeholder="Captain Image URL">
+                    </div>
+                    <button id="update-team-btn" class="btn-primary-full" style="background: #10b981">UPDATE TEAM & STATS</button>
+                </div>
+
+                <!-- Update Player Records -->
+                <div class="dashboard-card">
+                    <h3>Player Achievements</h3>
+                    <div class="form-group">
+                        <label>SELECT PLAYER</label>
+                        <select id="player-select"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>UPDATE IMAGE URL</label>
+                        <input type="text" id="player-image" placeholder="Image URL">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem;">
+                        <div style="grid-column: span 3; font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.5rem">SEASON STATS</div>
+                        <input type="number" id="player-season-runs" placeholder="Runs">
+                        <input type="number" id="player-season-wickets" placeholder="Wkts"><br>
+                        <input type="number" id="player-season-matches" placeholder="Matches">
+                        
+                        <div style="grid-column: span 3; font-size: 0.7rem; color: var(--text-muted); margin-top: 1rem; margin-bottom: 0.5rem">OVERALL STATS</div>
+                        <input type="number" id="player-overall-runs" placeholder="Runs">
+                        <input type="number" id="player-overall-wickets" placeholder="Wkts"><br>
+                        <input type="number" id="player-overall-matches" placeholder="Matches">
+                    </div>
+                    <button id="update-player-btn" class="btn-primary-full" style="background: var(--orange-gradient)">SYNC RECORDS</button>
+                </div>
+
+                <!-- System Notifications -->
+                <div class="dashboard-card">
+                    <h3>Broadcast</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 2rem;">Send instant email updates to all league participants.</p>
+                    <button id="notify-all-btn" class="btn-primary-full" style="background: var(--orange-gradient)">SEND NOTIFICATIONS</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="admin.js"></script>
+</body>
+</html>
