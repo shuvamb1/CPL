@@ -74,14 +74,26 @@ async function initPlayersPage() {
     renderPlayers();
     
     const playerSearch = document.getElementById('player-search');
-    playerSearch.addEventListener('input', (e) => {
-        const term = e.target.value.toLowerCase();
-        filteredPlayers = players.filter(p => 
-            p.name.toLowerCase().includes(term) || 
-            p.email.toLowerCase().includes(term)
-        );
-        renderPlayers();
-    });
+    if (playerSearch) {
+        playerSearch.addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            filteredPlayers = players.filter(p => 
+                p.name.toLowerCase().includes(term)
+            );
+            renderPlayers();
+        });
+    }
+
+    // Close modal when clicking outside or on close button
+    const modal = document.getElementById('player-modal');
+    const closeBtn = document.querySelector('.close-modal');
+    
+    if (closeBtn && modal) {
+        closeBtn.onclick = () => { modal.style.display = 'none'; };
+        window.onclick = (event) => {
+            if (event.target == modal) { modal.style.display = 'none'; }
+        }
+    }
 }
 
 // --- Data Fetching ---
@@ -214,8 +226,7 @@ function renderPlayers() {
                 ${player.image ? `<img src="${player.image}" alt="${player.name}" class="player-img">` : `<div class="no-image">👤</div>`}
             </div>
             <div class="player-info">
-                <h3>${player.name}</h3>
-                <span class="player-email">${player.email}</span>
+                <h3 class="player-name-clickable" onclick="openPlayerModal('${player._id}')">${player.name}</h3>
                 <div class="stats-grid">
                     <div class="stat-box">
                         <span class="stat-val">${player.seasonRecords.runs}</span>
@@ -296,4 +307,56 @@ function updateLeaderboardButtons() {
         seasonBtn.style.background = 'var(--text-muted)';
         overallBtn.style.background = 'var(--primary)';
     }
+}
+
+function openPlayerModal(playerId) {
+    const player = players.find(p => p._id === playerId);
+    if (!player) return;
+
+    const modal = document.getElementById('player-modal');
+    const detailsContainer = document.getElementById('modal-player-details');
+    if (!modal || !detailsContainer) return;
+
+    const achievementsHtml = player.achievements && player.achievements.length > 0
+        ? `
+            <div class="achievements-section">
+                <h3>🏆 Achievements</h3>
+                <ul class="achievement-list">
+                    ${player.achievements.map(a => `<li class="achievement-item">${a}</li>`).join('')}
+                </ul>
+            </div>
+        `
+        : '';
+
+    detailsContainer.innerHTML = `
+        <div class="modal-player-header">
+            <img src="${player.image || 'assets/default-player.webp'}" alt="${player.name}" class="modal-player-img">
+            <div class="modal-player-info">
+                <h2>${player.name}</h2>
+            </div>
+        </div>
+
+        <div class="section-header" style="margin-bottom: 1rem;">
+            <h3 style="font-size: 1.1rem; color: #fff;">Overall Career Records</h3>
+        </div>
+
+        <div class="modal-stats-grid">
+            <div class="modal-stat-card">
+                <span class="modal-stat-value">${player.overallRecords?.runs || 0}</span>
+                <span class="modal-stat-label">Runs</span>
+            </div>
+            <div class="modal-stat-card">
+                <span class="modal-stat-value">${player.overallRecords?.wickets || 0}</span>
+                <span class="modal-stat-label">Wickets</span>
+            </div>
+            <div class="modal-stat-card">
+                <span class="modal-stat-value">${player.overallRecords?.matches || 0}</span>
+                <span class="modal-stat-label">Matches</span>
+            </div>
+        </div>
+
+        ${achievementsHtml}
+    `;
+
+    modal.style.display = 'block';
 }
