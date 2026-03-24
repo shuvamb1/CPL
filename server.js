@@ -22,7 +22,6 @@ mongoose.connect(process.env.MONGODB_URI)
     console.log('MongoDB connected');
     try {
         await initTeams();
-        await initPlayers();
     } catch (error) {
         console.error('Initialization Error:', error);
     }
@@ -238,26 +237,7 @@ const initTeams = async () => {
     console.log('Teams data updated/initialized');
 };
 
-// Initialize Players (ensure legends exist)
-const initPlayers = async () => {
-    try {
-        // Drop unique index on email if it exists
-        await Player.collection.dropIndex('email_1');
-    } catch (e) {
-        // Index does not exist or already dropped
-    }
-    const mockPlayers = [
-        { name: 'Virat Kohli', overallRecords: { runs: 6500, wickets: 4, matches: 200 }, image: 'assets/RCB_CAPTAIN.jpeg' },
-        { name: 'MS Dhoni', overallRecords: { runs: 5000, wickets: 0, matches: 250 }, image: 'assets/CSK_CAPTAIN.jpeg' },
-        { name: 'Rohit Sharma', overallRecords: { runs: 5800, wickets: 15, matches: 220 }, image: 'assets/MI_CAPTAIN.jpeg' },
-        { name: 'Shreyas Iyer', overallRecords: { runs: 2800, wickets: 5, matches: 150 }, image: 'assets/KKR_CAPTAIN.jpeg' },
-        { name: 'Pat Cummins', overallRecords: { runs: 1200, wickets: 160, matches: 110 }, image: 'assets/SRH_CAPTAIN.jpeg' }
-    ];
-    for (const p of mockPlayers) {
-        await Player.findOneAndUpdate({ name: p.name }, p, { upsert: true });
-    }
-    console.log('Mock legend players ensured');
-};
+// Serve Frontend (Catch-all for SPA)
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
