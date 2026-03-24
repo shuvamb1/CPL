@@ -24,7 +24,6 @@ mongoose.connect(process.env.MONGODB_URI)
 // Schemas
 const PlayerSchema = new mongoose.Schema({
     name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
     seasonRecords: {
         runs: { type: Number, default: 0 },
         wickets: { type: Number, default: 0 },
@@ -35,7 +34,8 @@ const PlayerSchema = new mongoose.Schema({
         wickets: { type: Number, default: 0 },
         matches: { type: Number, default: 0 }
     },
-    image: { type: String, default: '' }
+    image: { type: String, default: '' },
+    achievements: { type: [String], default: [] }
 });
 
 const TeamSchema = new mongoose.Schema({
@@ -54,17 +54,6 @@ const TeamSchema = new mongoose.Schema({
 
 const Player = mongoose.model('Player', PlayerSchema);
 const Team = mongoose.model('Team', TeamSchema);
-
-// Email Transporter
-const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: process.env.SMTP_PORT,
-    secure: false, // true for 465, false for other ports
-    auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
-    }
-});
 
 // Admin Routes (Simple Key Protection)
 const adminAuth = (req, res, next) => {
@@ -88,13 +77,13 @@ app.get('/api/admin/verify', adminAuth, (req, res) => {
 // Register Player (Admin Only)
 app.post('/api/register', adminAuth, async (req, res) => {
     try {
-        const { name, email, image } = req.body;
-        const newPlayer = new Player({ name, email, image });
+        const { name, image } = req.body;
+        const newPlayer = new Player({ name, image });
         await newPlayer.save();
         res.status(201).json({ message: 'Player registered successfully' });
     } catch (error) {
         if (error.code === 11000) {
-            res.status(400).json({ message: 'Email already registered' });
+            res.status(400).json({ message: 'Player name already registered' });
         } else {
             res.status(500).json({ message: 'Error registering player', error });
         }
@@ -194,8 +183,8 @@ app.get('/api/teams', async (req, res) => {
 // Update Player Records
 app.post('/api/admin/update-player', adminAuth, async (req, res) => {
     try {
-        const { id, seasonRecords, overallRecords, image } = req.body;
-        await Player.findByIdAndUpdate(id, { seasonRecords, overallRecords, image });
+        const { id, seasonRecords, overallRecords, image, achievements } = req.body;
+        await Player.findByIdAndUpdate(id, { seasonRecords, overallRecords, image, achievements });
         res.json({ message: 'Player records updated' });
     } catch (error) {
         res.status(500).json({ message: 'Error updating player', error });
@@ -210,32 +199,6 @@ app.post('/api/admin/update-team', adminAuth, async (req, res) => {
         res.json({ message: 'Team stats updated' });
     } catch (error) {
         res.status(500).json({ message: 'Error updating team', error });
-    }
-});
-
-// Notify All Players
-app.post('/api/admin/notify', adminAuth, async (req, res) => {
-    try {
-        const players = await Player.find();
-        const emails = players.map(p => p.email);
-
-        if (emails.length === 0) {
-            return res.json({ message: 'No players to notify' });
-        }
-
-        const mailOptions = {
-            from: process.env.EMAIL_FROM,
-            to: emails.join(','),
-            subject: 'CPL Website Updated!',
-            text: 'Hello Player,\n\nThe CPL website has been updated with new records and points table. Check it out now!\n\nBest regards,\nCPL Admin',
-            html: '<p>Hello Player,</p><p>The CPL website has been updated with new records and points table. <a href="http://localhost:5000">Check it out now!</a></p><p>Best regards,<br>CPL Admin</p>'
-        };
-
-        await transporter.sendMail(mailOptions);
-        res.json({ message: 'Notifications sent successfully' });
-    } catch (error) {
-        console.error('Error sending emails:', error);
-        res.status(500).json({ message: 'Error sending notifications', error });
     }
 });
 
@@ -270,14 +233,14 @@ const initTeams = async () => {
 // Initialize Players (ensure legends exist)
 const initPlayers = async () => {
     const mockPlayers = [
-        { name: 'Virat Kohli', email: 'virat@cpl.com', overallRecords: { runs: 6500, wickets: 4, matches: 200 }, image: 'assets/RCB_CAPTAIN.jpeg' },
-        { name: 'MS Dhoni', email: 'msd@cpl.com', overallRecords: { runs: 5000, wickets: 0, matches: 250 }, image: 'assets/CSK_CAPTAIN.jpeg' },
-        { name: 'Rohit Sharma', email: 'rohit@cpl.com', overallRecords: { runs: 5800, wickets: 15, matches: 220 }, image: 'assets/MI_CAPTAIN.jpeg' },
-        { name: 'Shreyas Iyer', email: 'stats@cpl.com', overallRecords: { runs: 2800, wickets: 5, matches: 150 }, image: 'assets/KKR_CAPTAIN.jpeg' },
-        { name: 'Pat Cummins', email: 'cummo@cpl.com', overallRecords: { runs: 1200, wickets: 160, matches: 110 }, image: 'assets/SRH_CAPTAIN.jpeg' }
+        { name: 'Virat Kohli', overallRecords: { runs: 6500, wickets: 4, matches: 200 }, image: 'assets/RCB_CAPTAIN.jpeg' },
+        { name: 'MS Dhoni', overallRecords: { runs: 5000, wickets: 0, matches: 250 }, image: 'assets/CSK_CAPTAIN.jpeg' },
+        { name: 'Rohit Sharma', overallRecords: { runs: 5800, wickets: 15, matches: 220 }, image: 'assets/MI_CAPTAIN.jpeg' },
+        { name: 'Shreyas Iyer', overallRecords: { runs: 2800, wickets: 5, matches: 150 }, image: 'assets/KKR_CAPTAIN.jpeg' },
+        { name: 'Pat Cummins', overallRecords: { runs: 1200, wickets: 160, matches: 110 }, image: 'assets/SRH_CAPTAIN.jpeg' }
     ];
     for (const p of mockPlayers) {
-        await Player.findOneAndUpdate({ email: p.email }, p, { upsert: true });
+        await Player.findOneAndUpdate({ name: p.name }, p, { upsert: true });
     }
     console.log('Mock legend players ensured');
 };
