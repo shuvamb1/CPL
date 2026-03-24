@@ -18,7 +18,15 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB connected'))
+  .then(async () => {
+    console.log('MongoDB connected');
+    try {
+        await initTeams();
+        await initPlayers();
+    } catch (error) {
+        console.error('Initialization Error:', error);
+    }
+  })
   .catch(err => console.error('MongoDB connection error:', err));
 
 // Schemas
@@ -232,6 +240,12 @@ const initTeams = async () => {
 
 // Initialize Players (ensure legends exist)
 const initPlayers = async () => {
+    try {
+        // Drop unique index on email if it exists
+        await Player.collection.dropIndex('email_1');
+    } catch (e) {
+        // Index does not exist or already dropped
+    }
     const mockPlayers = [
         { name: 'Virat Kohli', overallRecords: { runs: 6500, wickets: 4, matches: 200 }, image: 'assets/RCB_CAPTAIN.jpeg' },
         { name: 'MS Dhoni', overallRecords: { runs: 5000, wickets: 0, matches: 250 }, image: 'assets/CSK_CAPTAIN.jpeg' },
@@ -245,8 +259,6 @@ const initPlayers = async () => {
     console.log('Mock legend players ensured');
 };
 
-app.listen(PORT, async () => {
+app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    await initTeams();
-    await initPlayers();
 });
