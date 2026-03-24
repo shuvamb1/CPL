@@ -230,11 +230,21 @@ const initTeams = async () => {
     for (const team of teamsData) {
         await Team.findOneAndUpdate(
             { name: team.name },
-            { $set: { logo: team.logo, 'captain.name': team.captain.name, 'captain.image': team.captain.image } },
+            { $setOnInsert: { 
+                logo: team.logo, 
+                'captain.name': team.captain.name, 
+                'captain.image': team.captain.image,
+                played: 0, won: 0, lost: 0, nrr: 0, points: 0
+            }},
             { upsert: true, new: true }
         );
     }
-    console.log('Teams data updated/initialized');
+    
+    // One-time cleanup for old legend players if they exist
+    const legendNames = ['Virat Kohli', 'MS Dhoni', 'Rohit Sharma', 'Shreyas Iyer', 'Pat Cummins'];
+    await Player.deleteMany({ name: { $in: legendNames }, seasonRecords: { runs: 0, wickets: 0, matches: 0 } });
+    
+    console.log('Teams data initialized (if new) and legacy mock players cleaned up');
 };
 
 // Serve Frontend (Catch-all for SPA)
