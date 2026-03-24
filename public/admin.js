@@ -103,6 +103,7 @@ playerSelect.addEventListener('change', () => {
         document.getElementById('player-overall-runs').value = player.overallRecords.runs;
         document.getElementById('player-overall-wickets').value = player.overallRecords.wickets;
         document.getElementById('player-overall-matches').value = player.overallRecords.matches;
+        document.getElementById('player-achievements').value = (player.achievements || []).join(', ');
     }
 });
 
@@ -125,7 +126,6 @@ registrationForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const payload = {
         name: document.getElementById('reg-name').value,
-        email: document.getElementById('reg-email').value,
         image: document.getElementById('reg-image').value
     };
 
@@ -220,7 +220,8 @@ document.getElementById('update-player-btn').addEventListener('click', async () 
             runs: parseInt(document.getElementById('player-overall-runs').value) || 0,
             wickets: parseInt(document.getElementById('player-overall-wickets').value) || 0,
             matches: parseInt(document.getElementById('player-overall-matches').value) || 0
-        }
+        },
+        achievements: document.getElementById('player-achievements').value.split(',').map(s => s.trim()).filter(s => s !== '')
     };
 
     const res = await fetch(`${API_URL}/admin/update-player`, {
@@ -236,15 +237,7 @@ document.getElementById('update-player-btn').addEventListener('click', async () 
     if (res.ok) fetchData();
 });
 
-// Notify All
-document.getElementById('notify-all-btn').addEventListener('click', async () => {
-    const res = await fetch(`${API_URL}/admin/notify`, {
-        method: 'POST',
-        headers: { 'x-admin-key': adminKey }
-    });
-    const data = await res.json();
-    alert(data.message);
-});
+// Initialization logic follows
 
 initMenu();
 checkSession();
