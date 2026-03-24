@@ -50,10 +50,6 @@
                             <input type="text" id="reg-name" placeholder="Enter name" required>
                         </div>
                         <div class="form-group">
-                            <label>EMAIL ADDRESS</label>
-                            <input type="email" id="reg-email" placeholder="Enter email" required>
-                        </div>
-                        <div class="form-group">
                             <label>PROFILE IMAGE URL</label>
                             <input type="text" id="reg-image" placeholder="https://example.com/photo.jpg">
                         </div>
@@ -111,10 +107,14 @@
                         <input type="number" id="player-overall-runs" placeholder="Runs">
                         <input type="number" id="player-overall-wickets" placeholder="Wkts"><br>
                         <input type="number" id="player-overall-matches" placeholder="Matches">
+                        
+                        <div style="grid-column: span 3; font-size: 0.7rem; color: var(--text-muted); margin-top: 1rem; margin-bottom: 0.5rem">ACHIEVEMENTS (Comma separated)</div>
+                        <textarea id="player-achievements" placeholder="e.g. Man of the Match, Hat-trick" style="grid-column: span 3; width: 100%; min-height: 80px; padding: 0.8rem; background: var(--card-bg); border: 1px solid var(--border-color); color: #a0aec0 !important; border-radius: 8px; font-family: inherit; font-size: 0.9rem;"></textarea>
                     </div>
                     <button id="update-player-btn" class="btn-primary-full" style="background: var(--orange-gradient)">SYNC RECORDS</button>
                 </div>
 
+                <!-- Update Player Records Card follows -->
             </div>
         </section>
     </main>
